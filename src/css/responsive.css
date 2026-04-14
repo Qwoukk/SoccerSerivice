@@ -1,0 +1,46 @@
+/* Дополнительная адаптивность */
+@media (max-width: 480px) {
+  .leagues-content {
+    padding: 0 16px;
+  }
+  
+  .search-wrapper {
+    margin-top: 12px;
+    margin-bottom: 24px;
+  }
+  
+  .league-name {
+    font-size: 14px;
+  }
+  
+  .league-country {
+    font-size: 12px;
+  }
+}
+
+/* Landscape ориентация */
+@media (orientation: landscape) and (max-height: 600px) {
+  .main-bg {
+    padding-top: 56px;
+  }
+  
+  .leagues-grid {
+    gap: 12px;
+  }
+  
+  .league-card {
+    height: auto;
+    min-height: 220px;
+  }
+  
+  .league-logo-wrapper {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 12px;
+  }
+  
+  .league-logo {
+    width: 60px;
+    height: 60px;
+  }
+}
