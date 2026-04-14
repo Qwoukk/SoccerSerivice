@@ -5,12 +5,8 @@
       <div class="search-section">
         <div class="search-label"></div>
         <div class="search-wrapper">
-          <img 
-            src="/search/Search.svg"
-            alt="search" 
-            class="search-icon"
-          />
-          <input 
+          <img src="/search/Search.svg" alt="search" class="search-icon" />
+          <input
             type="text"
             v-model="search"
             placeholder="Search"
@@ -21,10 +17,10 @@
             @keyup.enter="handleSearch"
             @input="showClearIcon = search.length > 0"
           />
-          <img 
+          <img
             v-if="search.length > 0"
             src="/search/clear.svg"
-            alt="clear" 
+            alt="clear"
             class="clear-icon"
             :class="{ visible: showClearIcon }"
             @click="clearSearch"
@@ -54,11 +50,10 @@
           class="league-card teams-card"
           @click="goToTeam(team.id)"
         >
-
           <div class="league-logo-wrapper">
-            <img 
-              v-if="team.crest" 
-              :src="team.crest" 
+            <img
+              v-if="team.crest"
+              :src="team.crest"
               :alt="team.name"
               class="league-logo"
               @error="handleImageError"
@@ -67,53 +62,61 @@
               <span></span>
             </div>
           </div>
-          
+
           <div class="team-info">
             <div class="team-name">{{ team.name }}</div>
           </div>
         </div>
       </div>
 
+      <!-- Пагинация -->
       <div v-if="!loading && !error && totalPages > 1" class="pagination-wrapper">
-        <button 
-          class="pagination-btn"
-          :disabled="page === 1"
-          @click="page = 1"
-        >
-          <img src="/pagination/pagination.svg" alt="first" class="pagination-icon" />
-        </button>
-        
-        <button 
-          class="pagination-btn"
+        <!-- Стрелка назад -->
+        <button
+          class="pagination-btn pagination-arrow"
           :disabled="page === 1"
           @click="page--"
+          aria-label="Предыдущая страница"
         >
-          <img src="/pagination/pagination.svg" alt="prev" class="pagination-icon prev" />
+          <svg width="6" height="10" viewBox="0 0 6 10" fill="none">
+            <path
+              d="M5.25 1.75L1.5 5L5.25 8.25"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
         </button>
-        
-        <button 
-          v-for="pageNum in visiblePages" 
-          :key="pageNum"
-          :class="['pagination-btn', { active: page === pageNum }]"
-          @click="page = pageNum"
-        >
-          {{ pageNum }}
-        </button>
-        
-        <button 
-          class="pagination-btn"
+
+        <!-- Номера страниц с троеточием -->
+        <template v-for="item in paginationItems" :key="item">
+          <span v-if="item === '...'" class="pagination-dots">...</span>
+          <button
+            v-else
+            :class="['pagination-btn', { active: page === item }]"
+            @click="page = item"
+          >
+            {{ item }}
+          </button>
+        </template>
+
+        <!-- Стрелка вперёд -->
+        <button
+          class="pagination-btn pagination-arrow"
           :disabled="page === totalPages"
           @click="page++"
+          aria-label="Следующая страница"
         >
-          <img src="/pagination/pagination.svg" alt="next" class="pagination-icon next" />
-        </button>
-        
-        <button 
-          class="pagination-btn"
-          :disabled="page === totalPages"
-          @click="page = totalPages"
-        >
-          <img src="/pagination/pagination.svg" alt="last" class="pagination-icon" />
+          <svg width="6" height="10" viewBox="0 0 6 10" fill="none">
+            <path
+              d="M0.75 8.25L4.5 5L0.75 1.75"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
         </button>
       </div>
     </div>
@@ -121,7 +124,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import axios from 'axios';
 
 export default {
   name: 'Teams',
@@ -135,117 +138,134 @@ export default {
       loading: false,
       error: null,
       showClearIcon: false,
-      searchExecuted: false
-    }
+      searchExecuted: false,
+    };
   },
   computed: {
     filteredTeams() {
-      if (!this.searchQuery.trim()) return this.teams
-      const q = this.searchQuery.toLowerCase()
-      return this.teams.filter(team =>
-        team.name.toLowerCase().includes(q)
-      )
+      if (!this.searchQuery.trim()) return this.teams;
+      const q = this.searchQuery.toLowerCase();
+      return this.teams.filter((team) => team.name.toLowerCase().includes(q));
     },
     paginatedTeams() {
-      const start = (this.page - 1) * this.itemsPerPage
-      return this.filteredTeams.slice(start, start + this.itemsPerPage)
+      const start = (this.page - 1) * this.itemsPerPage;
+      return this.filteredTeams.slice(start, start + this.itemsPerPage);
     },
     totalPages() {
-      return Math.ceil(this.filteredTeams.length / this.itemsPerPage)
+      return Math.ceil(this.filteredTeams.length / this.itemsPerPage);
     },
-    visiblePages() {
-      let start = Math.max(1, this.page - 2)
-      let end = Math.min(this.totalPages, start + 4)
-      if (end - start < 4) {
-        start = Math.max(1, end - 4)
+    paginationItems() {
+      const total = this.totalPages;
+      const current = this.page;
+      const items = [];
+
+      if (total <= 7) {
+        // Все страницы без троеточия
+        for (let i = 1; i <= total; i++) items.push(i);
+        return items;
       }
-      const pages = []
-      for (let i = start; i <= end; i++) {
-        pages.push(i)
+
+      // Всегда показываем первую
+      items.push(1);
+
+      if (current > 4) {
+        items.push('...');
       }
-      return pages
-    }
+
+      // Окно вокруг текущей страницы
+      const start = Math.max(2, current - 2);
+      const end = Math.min(total - 1, current + 2);
+      for (let i = start; i <= end; i++) items.push(i);
+
+      if (current < total - 3) {
+        items.push('...');
+      }
+
+      // Всегда показываем последнюю
+      items.push(total);
+
+      return items;
+    },
   },
   watch: {
     searchQuery() {
-      this.page = 1
-    }
+      this.page = 1;
+    },
   },
   async mounted() {
-    await this.fetchTeams()
+    await this.fetchTeams();
   },
   methods: {
     async fetchTeams() {
-      this.loading = true
-      this.error = null
-      
+      this.loading = true;
+      this.error = null;
+
       try {
         const { data } = await axios.get('/api/v4/teams', {
-          headers: { 
-            'X-Auth-Token': import.meta.env.VITE_API_TOKEN 
-          }
-        })
-        
-        this.teams = (data.teams || []).map(team => ({
+          headers: {
+            'X-Auth-Token': import.meta.env.VITE_API_TOKEN,
+          },
+        });
+
+        this.teams = (data.teams || []).map((team) => ({
           ...team,
-          crest: team.crest || null
-        }))
-        
+          crest: team.crest || null,
+        }));
       } catch (err) {
-        const status = err.response?.status
+        const status = err.response?.status;
         if (status === 429) {
-          this.error = 'Превышен лимит запросов к API. Попробуйте позже.'
+          this.error = 'Превышен лимит запросов к API. Попробуйте позже.';
         } else if (status === 403) {
-          this.error = 'Неверный API-токен. Проверьте переменную VITE_API_TOKEN.'
+          this.error = 'Неверный API-токен. Проверьте переменную VITE_API_TOKEN.';
         } else {
-          this.error = 'Не удалось загрузить данные. Проверьте соединение с интернетом.'
+          this.error = 'Не удалось загрузить данные. Проверьте соединение с интернетом.';
         }
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
     handleFocus() {
       // Убираем тень при фокусе
-      this.searchExecuted = false
+      this.searchExecuted = false;
     },
     handleBlur() {
       // Если после потери фокуса есть текст, но не было Enter, показываем крестик
       if (this.search.length > 0 && !this.searchExecuted) {
-        this.showClearIcon = true
+        this.showClearIcon = true;
       }
     },
     handleSearch() {
-      this.searchQuery = this.search
-      this.searchExecuted = true
-      this.showClearIcon = false
+      this.searchQuery = this.search;
+      this.searchExecuted = true;
+      this.showClearIcon = false;
       // Убираем фокус с input элемента
       this.$nextTick(() => {
-        const input = document.querySelector('.search-input')
-        if (input) input.blur()
-      })
+        const input = document.querySelector('.search-input');
+        if (input) input.blur();
+      });
     },
     clearSearch() {
-      this.search = ''
-      this.searchQuery = ''
-      this.showClearIcon = false
-      this.searchExecuted = false
+      this.search = '';
+      this.searchQuery = '';
+      this.showClearIcon = false;
+      this.searchExecuted = false;
       // Фокусируемся на поле ввода после очистки
       this.$nextTick(() => {
-        const input = document.querySelector('.search-input')
-        if (input) input.focus()
-      })
+        const input = document.querySelector('.search-input');
+        if (input) input.focus();
+      });
     },
     goToTeam(id) {
-      this.$router.push({ name: 'TeamMatches', params: { id } })
+      this.$router.push({ name: 'TeamMatches', params: { id } });
     },
     handleImageError(event) {
-      const imgElement = event.target
-      imgElement.style.display = 'none'
-      const placeholder = imgElement.nextElementSibling
+      const imgElement = event.target;
+      imgElement.style.display = 'none';
+      const placeholder = imgElement.nextElementSibling;
       if (placeholder) {
-        placeholder.style.display = 'flex'
+        placeholder.style.display = 'flex';
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>

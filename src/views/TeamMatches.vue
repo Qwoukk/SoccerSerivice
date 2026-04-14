@@ -1,36 +1,25 @@
 <template>
   <div class="leagues-page">
-  <div class="breadcrumbs-wrapper">
-        <span class="breadcrumb-link" @click="goToTeams">Команды</span>
-        <span class="breadcrumb-separator">></span>
-        <span class="breadcrumb-current">{{ teamName }}</span>
-  </div>
-  <div class="leagues-container">
-
+    <div class="breadcrumbs-wrapper">
+      <span class="breadcrumb-link" @click="goToTeams">Команды</span>
+      <span class="breadcrumb-separator">></span>
+      <span class="breadcrumb-current">{{ teamName }}</span>
+    </div>
+    <div class="leagues-container">
       <!-- Блок фильтрации по дате -->
       <div class="filter-section">
-  <div class="filter-label">Матчи с</div>
-  <div class="date-input-wrapper">
-    <input 
-      type="date" 
-      v-model="dateFrom" 
-      class="date-input"
-      :max="dateTo || undefined"
-    />
-    <img src="/Calendarpicker.svg" alt="calendar" class="calendar-icon" />
-  </div>
-  
-  <div class="filter-label">По</div>
-  <div class="date-input-wrapper">
-    <input 
-      type="date" 
-      v-model="dateTo" 
-      class="date-input"
-      :min="dateFrom || undefined"
-    />
-    <img src="/Calendarpicker.svg" alt="calendar" class="calendar-icon" />
-  </div>
-</div>
+        <div class="filter-label">Матчи с</div>
+        <div class="date-input-wrapper">
+          <input type="date" v-model="dateFrom" class="date-input" :max="dateTo || undefined" />
+          <img src="/Calendarpicker.svg" alt="calendar" class="calendar-icon" />
+        </div>
+
+        <div class="filter-label">По</div>
+        <div class="date-input-wrapper">
+          <input type="date" v-model="dateTo" class="date-input" :min="dateFrom || undefined" />
+          <img src="/Calendarpicker.svg" alt="calendar" class="calendar-icon" />
+        </div>
+      </div>
       <!-- Таблица матчей -->
       <div v-if="loading" class="matches-table">
         <div v-for="n in 5" :key="n" class="match-row-skeleton">
@@ -47,24 +36,18 @@
       </div>
 
       <div v-else class="matches-table">
-        <div
-          v-for="match in paginatedMatches"
-          :key="match.id"
-          class="match-row"
-        >
+        <div v-for="match in paginatedMatches" :key="match.id" class="match-row">
           <div class="match-date">{{ formatDate(match.utcDate) }}</div>
           <div class="match-time">{{ formatTime(match.utcDate) }}</div>
-          
+
           <div class="match-status">
             <span :class="getStatusClass(match.status)">
               {{ getStatusText(match.status) }}
             </span>
           </div>
-          
-          <div class="match-teams">
-            {{ match.homeTeam.name }} - {{ match.awayTeam.name }}
-          </div>
-          
+
+          <div class="match-teams">{{ match.homeTeam.name }} - {{ match.awayTeam.name }}</div>
+
           <div class="match-score">
             {{ formatScore(match) }}
           </div>
@@ -72,17 +55,54 @@
       </div>
 
       <!-- Пагинация -->
+
       <div v-if="!loading && !error && totalPages > 1" class="pagination-wrapper">
-        <button 
-          v-for="pageNum in visiblePages" 
-          :key="pageNum"
-          :class="['pagination-btn', { active: page === pageNum }]"
-          @click="page = pageNum"
+        <!-- Стрелка назад -->
+        <button
+          class="pagination-btn pagination-arrow"
+          :disabled="page === 1"
+          @click="page--"
+          aria-label="Предыдущая страница"
         >
-          {{ pageNum }}
+          <svg width="6" height="10" viewBox="0 0 6 10" fill="none">
+            <path
+              d="M5.25 1.75L1.5 5L5.25 8.25"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
         </button>
-        <button v-if="totalPages > 5 && visiblePages[visiblePages.length - 1] < totalPages" class="pagination-btn" @click="page = totalPages">
-          {{ totalPages }}
+
+        <!-- Номера страниц с троеточием -->
+        <template v-for="item in paginationItems" :key="item">
+          <span v-if="item === '...'" class="pagination-dots">...</span>
+          <button
+            v-else
+            :class="['pagination-btn', { active: page === item }]"
+            @click="page = item"
+          >
+            {{ item }}
+          </button>
+        </template>
+
+        <!-- Стрелка вперёд -->
+        <button
+          class="pagination-btn pagination-arrow"
+          :disabled="page === totalPages"
+          @click="page++"
+          aria-label="Следующая страница"
+        >
+          <svg width="6" height="10" viewBox="0 0 6 10" fill="none">
+            <path
+              d="M0.75 1.75L4.5 5L0.75 8.25"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
         </button>
       </div>
     </div>
@@ -90,7 +110,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import axios from 'axios';
 
 export default {
   name: 'TeamMatches',
@@ -104,131 +124,150 @@ export default {
       page: 1,
       itemsPerPage: 10,
       loading: false,
-      error: null
-    }
+      error: null,
+    };
   },
   computed: {
     filteredMatches() {
-      let filtered = [...this.matches]
-      
+      let filtered = [...this.matches];
+
       if (this.dateFrom) {
-        const fromDate = new Date(this.dateFrom)
-        fromDate.setHours(0, 0, 0, 0)
-        filtered = filtered.filter(match => {
-          const matchDate = new Date(match.utcDate)
-          return matchDate >= fromDate
-        })
+        const fromDate = new Date(this.dateFrom);
+        fromDate.setHours(0, 0, 0, 0);
+        filtered = filtered.filter((match) => {
+          const matchDate = new Date(match.utcDate);
+          return matchDate >= fromDate;
+        });
       }
-      
+
       if (this.dateTo) {
-        const toDate = new Date(this.dateTo)
-        toDate.setHours(23, 59, 59, 999)
-        filtered = filtered.filter(match => {
-          const matchDate = new Date(match.utcDate)
-          return matchDate <= toDate
-        })
+        const toDate = new Date(this.dateTo);
+        toDate.setHours(23, 59, 59, 999);
+        filtered = filtered.filter((match) => {
+          const matchDate = new Date(match.utcDate);
+          return matchDate <= toDate;
+        });
       }
-      
-      return filtered
+
+      return filtered;
     },
     paginatedMatches() {
-      const start = (this.page - 1) * this.itemsPerPage
-      const end = start + this.itemsPerPage
-      return this.filteredMatches.slice(start, end)
+      const start = (this.page - 1) * this.itemsPerPage;
+      const end = start + this.itemsPerPage;
+      return this.filteredMatches.slice(start, end);
     },
     totalPages() {
-      return Math.ceil(this.filteredMatches.length / this.itemsPerPage)
+      return Math.ceil(this.filteredMatches.length / this.itemsPerPage);
     },
-    visiblePages() {
-      let start = Math.max(1, this.page - 2)
-      let end = Math.min(this.totalPages, start + 4)
-      if (end - start < 4) {
-        start = Math.max(1, end - 4)
+    paginationItems() {
+      const total = this.totalPages;
+      const current = this.page;
+      const items = [];
+
+      if (total <= 7) {
+        // Все страницы без троеточия
+        for (let i = 1; i <= total; i++) items.push(i);
+        return items;
       }
-      const pages = []
-      for (let i = start; i <= end; i++) {
-        pages.push(i)
+
+      // Всегда показываем первую
+      items.push(1);
+
+      if (current > 4) {
+        items.push('...');
       }
-      return pages
-    }
+
+      // Окно вокруг текущей страницы
+      const start = Math.max(2, current - 2);
+      const end = Math.min(total - 1, current + 2);
+      for (let i = start; i <= end; i++) items.push(i);
+
+      if (current < total - 3) {
+        items.push('...');
+      }
+
+      // Всегда показываем последнюю
+      items.push(total);
+
+      return items;
+    },
   },
   watch: {
     dateFrom() {
-      this.page = 1
-      this.loadMatches()
+      this.page = 1;
+      this.loadMatches();
     },
     dateTo() {
-      this.page = 1
-      this.loadMatches()
-    }
+      this.page = 1;
+      this.loadMatches();
+    },
   },
   async mounted() {
-    this.teamId = this.$route.params.id
-    await this.loadMatches()
+    this.teamId = this.$route.params.id;
+    await this.loadMatches();
   },
   methods: {
     async loadMatches() {
-      this.loading = true
-      this.error = null
-      
+      this.loading = true;
+      this.error = null;
+
       try {
-        let url = `/api/v4/teams/${this.teamId}/matches`
-        const params = {}
-        
+        let url = `/api/v4/teams/${this.teamId}/matches`;
+        const params = {};
+
         if (this.dateFrom && this.dateTo) {
-          params.dateFrom = this.dateFrom
-          params.dateTo = this.dateTo
+          params.dateFrom = this.dateFrom;
+          params.dateTo = this.dateTo;
         }
-        
+
         const response = await axios.get(url, {
           headers: {
-            'X-Auth-Token': import.meta.env.VITE_API_TOKEN
+            'X-Auth-Token': import.meta.env.VITE_API_TOKEN,
           },
-          params
-        })
-        
-        this.matches = response.data.matches || []
-        
+          params,
+        });
+
+        this.matches = response.data.matches || [];
+
         // Получаем название команды отдельным запросом, если не пришло в ответе
         if (response.data.team?.name) {
-          this.teamName = response.data.team.name
+          this.teamName = response.data.team.name;
         } else {
           const teamResponse = await axios.get(`/api/v4/teams/${this.teamId}`, {
             headers: {
-              'X-Auth-Token': import.meta.env.VITE_API_TOKEN
-            }
-          })
-          this.teamName = teamResponse.data.name
+              'X-Auth-Token': import.meta.env.VITE_API_TOKEN,
+            },
+          });
+          this.teamName = teamResponse.data.name;
         }
-        
       } catch (err) {
-        const status = err.response?.status
+        const status = err.response?.status;
         if (status === 429) {
-          this.error = 'Превышен лимит запросов к API. Попробуйте позже.'
+          this.error = 'Превышен лимит запросов к API. Попробуйте позже.';
         } else if (status === 403) {
-          this.error = 'Неверный API-токен. Проверьте переменную VITE_API_TOKEN.'
+          this.error = 'Неверный API-токен. Проверьте переменную VITE_API_TOKEN.';
         } else {
-          this.error = 'Не удалось загрузить матчи. Проверьте соединение с интернетом.'
+          this.error = 'Не удалось загрузить матчи. Проверьте соединение с интернетом.';
         }
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
     formatDate(dateString) {
-      const date = new Date(dateString)
+      const date = new Date(dateString);
       return date.toLocaleDateString('ru-RU', {
         day: '2-digit',
         month: '2-digit',
-        year: 'numeric'
-      })
+        year: 'numeric',
+      });
     },
     formatTime(dateString) {
-      const date = new Date(dateString)
-      return date.toLocaleTimeString('ru-RU', { 
-        hour: '2-digit', 
+      const date = new Date(dateString);
+      return date.toLocaleTimeString('ru-RU', {
+        hour: '2-digit',
         minute: '2-digit',
-        hour12: false
-      })
+        hour12: false,
+      });
     },
     getStatusText(status) {
       const statuses = {
@@ -239,9 +278,9 @@ export default {
         FINISHED: 'Завершен',
         POSTPONED: 'Отложен',
         SUSPENDED: 'Приостановлен',
-        CANCELLED: 'Отменен'
-      }
-      return statuses[status] || status
+        CANCELLED: 'Отменен',
+      };
+      return statuses[status] || status;
     },
     getStatusClass(status) {
       const classes = {
@@ -252,36 +291,51 @@ export default {
         FINISHED: 'status-finished',
         POSTPONED: 'status-postponed',
         SUSPENDED: 'status-suspended',
-        CANCELLED: 'status-cancelled'
-      }
-      return classes[status] || ''
+        CANCELLED: 'status-cancelled',
+      };
+      return classes[status] || '';
     },
     formatScore(match) {
-      const parts = []
-      
-      const homeFull = match.score?.fullTime?.home
-      const awayFull = match.score?.fullTime?.away
-      if (homeFull !== null && homeFull !== undefined && awayFull !== null && awayFull !== undefined) {
-        parts.push(`${homeFull}:${awayFull}`)
+      const parts = [];
+
+      const homeFull = match.score?.fullTime?.home;
+      const awayFull = match.score?.fullTime?.away;
+      if (
+        homeFull !== null &&
+        homeFull !== undefined &&
+        awayFull !== null &&
+        awayFull !== undefined
+      ) {
+        parts.push(`${homeFull}:${awayFull}`);
       }
-      
-      const homeExtra = match.score?.extraTime?.home
-      const awayExtra = match.score?.extraTime?.away
-      if (homeExtra !== null && homeExtra !== undefined && awayExtra !== null && awayExtra !== undefined) {
-        parts.push(`(${homeExtra}:${awayExtra})`)
+
+      const homeExtra = match.score?.extraTime?.home;
+      const awayExtra = match.score?.extraTime?.away;
+      if (
+        homeExtra !== null &&
+        homeExtra !== undefined &&
+        awayExtra !== null &&
+        awayExtra !== undefined
+      ) {
+        parts.push(`(${homeExtra}:${awayExtra})`);
       }
-      
-      const homePenalties = match.score?.penalties?.home
-      const awayPenalties = match.score?.penalties?.away
-      if (homePenalties !== null && homePenalties !== undefined && awayPenalties !== null && awayPenalties !== undefined) {
-        parts.push(`(${homePenalties}:${awayPenalties})`)
+
+      const homePenalties = match.score?.penalties?.home;
+      const awayPenalties = match.score?.penalties?.away;
+      if (
+        homePenalties !== null &&
+        homePenalties !== undefined &&
+        awayPenalties !== null &&
+        awayPenalties !== undefined
+      ) {
+        parts.push(`(${homePenalties}:${awayPenalties})`);
       }
-      
-      return parts.length > 0 ? parts.join(' ') : '- : -'
+
+      return parts.length > 0 ? parts.join(' ') : '- : -';
     },
     goToTeams() {
-      this.$router.push({ name: 'Teams' })
-    }
-  }
-}
+      this.$router.push({ name: 'Teams' });
+    },
+  },
+};
 </script>
