@@ -1,13 +1,11 @@
 <template>
   <div class="leagues-page">
-    <div class="leagues-container">
-      <!-- Хлебные крошки -->
-      <div class="breadcrumbs-wrapper">
+  <div class="breadcrumbs-wrapper">
         <span class="breadcrumb-link" @click="goToLeagues">Лиги</span>
         <span class="breadcrumb-separator">></span>
         <span class="breadcrumb-current">{{ leagueName }}</span>
       </div>
-
+    <div class="leagues-container">
     <!-- Блок фильтрации по дате с кастомной иконкой календаря -->
 <div class="filter-section">
   <div class="filter-label">Матчи с</div>

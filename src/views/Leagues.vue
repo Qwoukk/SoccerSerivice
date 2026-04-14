@@ -1,6 +1,7 @@
 <template>
   <div class="leagues-page">
     <div class="leagues-container">
+      <!-- Поисковая строка -->
       <div class="search-section">
         <div class="search-label"></div>
         <div class="search-wrapper">
@@ -10,15 +11,28 @@
             class="search-icon"
           />
           <input 
-            type="text"
+            type="search"
             v-model="search"
             placeholder="Search"
             class="search-input"
+            :class="{ 'search-executed': searchExecuted }"
+            @focus="handleFocus"
+            @blur="handleBlur"
+            @keyup.enter="handleSearch"
+            @input="showClearIcon = search.length > 0"
+          />
+          <img 
+            v-if="search.length > 0"
+            src="/search/clear.svg"
+            alt="clear" 
+            class="clear-icon"
+            :class="{ visible: showClearIcon }"
+            @click="clearSearch"
           />
         </div>
       </div>
 
-      <!-- Скелетон загрузки -->
+      <!-- Остальной код... -->
       <div v-if="loading" class="leagues-grid">
         <div v-for="n in 16" :key="n" class="league-card-skeleton">
           <div class="skeleton-logo"></div>
@@ -51,7 +65,7 @@
               @error="handleImageError"
             />
             <div v-else class="league-logo-placeholder">
-              <span>🏆</span>
+              <span></span>
             </div>
           </div>
           
@@ -70,7 +84,6 @@
           @click="page = 1"
         >
           <img src="/pagination/pagination.svg" alt="first" class="pagination-icon" />
-          <span class="pagination-icon-text">Первая</span>
         </button>
         
         <button 
@@ -104,7 +117,6 @@
           @click="page = totalPages"
         >
           <img src="/pagination/pagination.svg" alt="last" class="pagination-icon" />
-          <span class="pagination-icon-text">Последняя</span>
         </button>
       </div>
     </div>
@@ -120,16 +132,19 @@ export default {
     return {
       leagues: [],
       search: '',
+      searchQuery: '',
       page: 1,
       itemsPerPage: 16,
       loading: false,
-      error: null
+      error: null,
+      showClearIcon: false,
+      searchExecuted: false
     }
   },
   computed: {
     filteredLeagues() {
-      if (!this.search.trim()) return this.leagues
-      const q = this.search.toLowerCase()
+      if (!this.searchQuery.trim()) return this.leagues
+      const q = this.searchQuery.toLowerCase()
       return this.leagues.filter(
         l => l.name.toLowerCase().includes(q) || 
              l.area.name.toLowerCase().includes(q)
@@ -156,7 +171,7 @@ export default {
     }
   },
   watch: {
-    search() {
+    searchQuery() {
       this.page = 1
     }
   },
@@ -164,6 +179,37 @@ export default {
     await this.fetchLeagues()
   },
   methods: {
+    handleFocus() {
+      // Убираем тень при фокусе
+      this.searchExecuted = false
+    },
+    handleBlur() {
+      // Если после потери фокуса есть текст, но не было Enter, показываем крестик
+      if (this.search.length > 0 && !this.searchExecuted) {
+        this.showClearIcon = true
+      }
+    },
+    handleSearch() {
+      this.searchQuery = this.search
+      this.searchExecuted = true
+      this.showClearIcon = false
+      // Убираем фокус с input элемента
+      this.$nextTick(() => {
+        const input = document.querySelector('.search-input')
+        if (input) input.blur()
+      })
+    },
+    clearSearch() {
+      this.search = ''
+      this.searchQuery = ''
+      this.showClearIcon = false
+      this.searchExecuted = false
+      // Фокусируемся на поле ввода после очистки
+      this.$nextTick(() => {
+        const input = document.querySelector('.search-input')
+        if (input) input.focus()
+      })
+    },
     async fetchLeagues() {
       this.loading = true
       this.error = null

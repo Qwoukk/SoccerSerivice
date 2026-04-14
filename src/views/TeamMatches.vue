@@ -1,12 +1,11 @@
 <template>
   <div class="leagues-page">
-    <div class="leagues-container">
-      <!-- Хлебные крошки -->
-      <div class="breadcrumbs-wrapper">
+  <div class="breadcrumbs-wrapper">
         <span class="breadcrumb-link" @click="goToTeams">Команды</span>
         <span class="breadcrumb-separator">></span>
         <span class="breadcrumb-current">{{ teamName }}</span>
-      </div>
+  </div>
+  <div class="leagues-container">
 
       <!-- Блок фильтрации по дате -->
       <div class="filter-section">

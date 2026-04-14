@@ -15,6 +15,19 @@
             v-model="search"
             placeholder="Search"
             class="search-input"
+            :class="{ 'search-executed': searchExecuted }"
+            @focus="handleFocus"
+            @blur="handleBlur"
+            @keyup.enter="handleSearch"
+            @input="showClearIcon = search.length > 0"
+          />
+          <img 
+            v-if="search.length > 0"
+            src="/search/clear.svg"
+            alt="clear" 
+            class="clear-icon"
+            :class="{ visible: showClearIcon }"
+            @click="clearSearch"
           />
         </div>
       </div>
@@ -116,16 +129,19 @@ export default {
     return {
       teams: [],
       search: '',
+      searchQuery: '',
       page: 1,
       itemsPerPage: 16,
       loading: false,
-      error: null
+      error: null,
+      showClearIcon: false,
+      searchExecuted: false
     }
   },
   computed: {
     filteredTeams() {
-      if (!this.search.trim()) return this.teams
-      const q = this.search.toLowerCase()
+      if (!this.searchQuery.trim()) return this.teams
+      const q = this.searchQuery.toLowerCase()
       return this.teams.filter(team =>
         team.name.toLowerCase().includes(q)
       )
@@ -151,7 +167,7 @@ export default {
     }
   },
   watch: {
-    search() {
+    searchQuery() {
       this.page = 1
     }
   },
@@ -187,6 +203,37 @@ export default {
       } finally {
         this.loading = false
       }
+    },
+    handleFocus() {
+      // Убираем тень при фокусе
+      this.searchExecuted = false
+    },
+    handleBlur() {
+      // Если после потери фокуса есть текст, но не было Enter, показываем крестик
+      if (this.search.length > 0 && !this.searchExecuted) {
+        this.showClearIcon = true
+      }
+    },
+    handleSearch() {
+      this.searchQuery = this.search
+      this.searchExecuted = true
+      this.showClearIcon = false
+      // Убираем фокус с input элемента
+      this.$nextTick(() => {
+        const input = document.querySelector('.search-input')
+        if (input) input.blur()
+      })
+    },
+    clearSearch() {
+      this.search = ''
+      this.searchQuery = ''
+      this.showClearIcon = false
+      this.searchExecuted = false
+      // Фокусируемся на поле ввода после очистки
+      this.$nextTick(() => {
+        const input = document.querySelector('.search-input')
+        if (input) input.focus()
+      })
     },
     goToTeam(id) {
       this.$router.push({ name: 'TeamMatches', params: { id } })
