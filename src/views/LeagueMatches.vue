@@ -129,27 +129,19 @@ export default {
   },
   computed: {
     filteredMatches() {
-      let filtered = [...this.matches];
-
-      if (this.dateFrom) {
-        const fromDate = new Date(this.dateFrom);
-        fromDate.setHours(0, 0, 0, 0);
-        filtered = filtered.filter((match) => {
-          const matchDate = new Date(match.utcDate);
-          return matchDate >= fromDate;
-        });
+      if (!this.dateFrom || !this.dateTo) {
+        return [...this.matches];
       }
 
-      if (this.dateTo) {
-        const toDate = new Date(this.dateTo);
-        toDate.setHours(23, 59, 59, 999);
-        filtered = filtered.filter((match) => {
-          const matchDate = new Date(match.utcDate);
-          return matchDate <= toDate;
-        });
-      }
+      const fromDate = new Date(this.dateFrom);
+      fromDate.setHours(0, 0, 0, 0);
+      const toDate = new Date(this.dateTo);
+      toDate.setHours(23, 59, 59, 999);
 
-      return filtered;
+      return this.matches.filter((match) => {
+        const matchDate = new Date(match.utcDate);
+        return matchDate >= fromDate && matchDate <= toDate;
+      });
     },
     paginatedMatches() {
       const start = (this.page - 1) * this.itemsPerPage;
@@ -193,13 +185,17 @@ export default {
     },
   },
   watch: {
-    dateFrom() {
-      this.page = 1;
-      this.loadMatches();
+    dateFrom(val) {
+      if ((val && this.dateTo) || (!val && !this.dateTo)) {
+        this.page = 1;
+        this.loadMatches();
+      }
     },
-    dateTo() {
-      this.page = 1;
-      this.loadMatches();
+    dateTo(val) {
+      if ((val && this.dateFrom) || (!val && !this.dateFrom)) {
+        this.page = 1;
+        this.loadMatches();
+      }
     },
   },
   async mounted() {
@@ -268,6 +264,7 @@ export default {
         POSTPONED: 'Отложен',
         SUSPENDED: 'Приостановлен',
         CANCELLED: 'Отменен',
+        TIMED: 'Запланирован',
       };
       return statuses[status] || status;
     },

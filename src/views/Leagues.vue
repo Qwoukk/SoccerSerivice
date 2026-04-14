@@ -28,7 +28,6 @@
         </div>
       </div>
 
-      <!-- Остальной код... -->
       <div v-if="loading" class="leagues-grid">
         <div v-for="n in 16" :key="n" class="league-card-skeleton">
           <div class="skeleton-logo"></div>
@@ -201,7 +200,6 @@ export default {
   },
   methods: {
     handleFocus() {
-      // Убираем тень при фокусе
       this.searchExecuted = false;
     },
     handleBlur() {
