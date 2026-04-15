@@ -10,13 +10,21 @@
       <div class="filter-section">
         <div class="filter-label">Матчи с</div>
         <div class="date-input-wrapper">
-          <input type="date" v-model="dateFrom" class="date-input" :max="dateTo || undefined" />
+          <input
+            v-model="dateFrom"
+            type="date"
+            class="date-input"
+            :max="dateTo || undefined" />
           <img src="/Calendarpicker.svg" alt="calendar" class="calendar-icon" />
         </div>
 
         <div class="filter-label">По</div>
         <div class="date-input-wrapper">
-          <input type="date" v-model="dateTo" class="date-input" :min="dateFrom || undefined" />
+          <input
+            v-model="dateTo"
+            type="date"
+            class="date-input"
+            :min="dateFrom || undefined" />
           <img src="/Calendarpicker.svg" alt="calendar" class="calendar-icon" />
         </div>
       </div>
@@ -60,10 +68,14 @@
         <button
           class="pagination-btn pagination-arrow"
           :disabled="page === 1"
-          @click="page--"
           aria-label="Предыдущая страница"
+          @click="page--"
         >
-          <svg width="6" height="10" viewBox="0 0 6 10" fill="none">
+          <svg
+            width="6"
+            height="10"
+            viewBox="0 0 6 10"
+            fill="none">
             <path
               d="M5.25 1.75L1.5 5L5.25 8.25"
               stroke="currentColor"
@@ -88,10 +100,14 @@
         <button
           class="pagination-btn pagination-arrow"
           :disabled="page === totalPages"
-          @click="page++"
           aria-label="Следующая страница"
+          @click="page++"
         >
-          <svg width="6" height="10" viewBox="0 0 6 10" fill="none">
+          <svg
+            width="6"
+            height="10"
+            viewBox="0 0 6 10"
+            fill="none">
             <path
               d="M0.75 1.75L4.5 5L0.75 8.25"
               stroke="currentColor"
@@ -112,6 +128,9 @@ import { formatMatchDate, formatMatchTime, isMatchInLocalDateRange, getUTCRangeF
 
 export default {
   name: 'TeamMatches',
+  setup() {
+    return { formatMatchDate, formatMatchTime };
+  },
 
   data() {
     return {
@@ -246,12 +265,6 @@ export default {
       } finally {
         this.loading = false;
       }
-    },
-    formatMatchDate(dateString) {
-      return formatMatchDate(dateString);
-    },
-    formatMatchTime(dateString) {
-      return formatMatchTime(dateString);
     },
     getStatusText(status) {
       const statuses = {

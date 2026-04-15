@@ -6,17 +6,25 @@
       <span class="breadcrumb-current">{{ leagueName }}</span>
     </div>
     <div class="leagues-container">
-      <!-- Блок фильтрации по дате с кастомной иконкой календаря -->
+
       <div class="filter-section">
         <div class="filter-label">Матчи с</div>
         <div class="date-input-wrapper">
-          <input type="date" v-model="dateFrom" class="date-input" :max="dateTo || undefined" />
+          <input
+            v-model="dateFrom"
+            type="date"
+            class="date-input"
+            :max="dateTo || undefined" />
           <img src="/Calendarpicker.svg" alt="calendar" class="calendar-icon" />
         </div>
 
         <div class="filter-label">По</div>
         <div class="date-input-wrapper">
-          <input type="date" v-model="dateTo" class="date-input" :min="dateFrom || undefined" />
+          <input
+            v-model="dateTo"
+            type="date"
+            class="date-input"
+            :min="dateFrom || undefined" />
           <img src="/Calendarpicker.svg" alt="calendar" class="calendar-icon" />
         </div>
       </div>
@@ -57,14 +65,17 @@
 
       <!-- Пагинация -->
       <div v-if="!loading && !error && totalPages > 1" class="pagination-wrapper">
-        <!-- Стрелка назад -->
         <button
           class="pagination-btn pagination-arrow"
           :disabled="page === 1"
-          @click="page--"
           aria-label="Предыдущая страница"
+          @click="page--"
         >
-          <svg width="6" height="10" viewBox="0 0 6 10" fill="none">
+          <svg
+            width="6"
+            height="10"
+            viewBox="0 0 6 10"
+            fill="none">
             <path
               d="M5.25 1.75L1.5 5L5.25 8.25"
               stroke="currentColor"
@@ -75,7 +86,6 @@
           </svg>
         </button>
 
-        <!-- Номера страниц с троеточием -->
         <template v-for="item in paginationItems" :key="item">
           <span v-if="item === '...'" class="pagination-dots">...</span>
           <button
@@ -87,14 +97,17 @@
           </button>
         </template>
 
-        <!-- Стрелка вперёд -->
         <button
           class="pagination-btn pagination-arrow"
           :disabled="page === totalPages"
-          @click="page++"
           aria-label="Следующая страница"
+          @click="page++"
         >
-          <svg width="6" height="10" viewBox="0 0 6 10" fill="none">
+          <svg
+            width="6"
+            height="10"
+            viewBox="0 0 6 10"
+            fill="none">
             <path
               d="M0.75 1.75L4.5 5L0.75 8.25"
               stroke="currentColor"
@@ -112,13 +125,11 @@
 <script>
 import axios from 'axios';
 import { formatMatchDate, formatMatchTime, isMatchInLocalDateRange, getUTCRangeFromLocalDates } from '../utils/formatDate';
-const STORAGE_KEYS = {
-  DATE_FROM: 'leagueMatches_dateFrom',
-  DATE_TO: 'leagueMatches_dateTo',
-  PAGE: 'leagueMatches_page'
-};
 export default {
   name: 'LeagueMatches',
+  setup() {
+    return { formatMatchDate, formatMatchTime };
+  },
   data() {
     return {
       matches: [],
@@ -182,12 +193,6 @@ export default {
 
       return items;
     },
-  },
-  setup() {
-    return {
-      formatMatchDate,  // импортированная функция
-      formatMatchTime,  // импортированная функция
-    };
   },
   watch: {
    dateFrom(newVal, oldVal) {

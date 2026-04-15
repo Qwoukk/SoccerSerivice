@@ -8,8 +8,8 @@
           <img src="/search/Search.svg" alt="search" class="search-icon" />
           <input
             ref="searchInput"
-            type="text"
             v-model="search"
+            type="text"
             placeholder="Search"
             class="search-input"
             :class="{ 'search-executed': searchExecuted }"
@@ -78,10 +78,14 @@
         <button
           class="pagination-btn pagination-arrow"
           :disabled="page === 1"
-          @click="page--"
           aria-label="Предыдущая страница"
+          @click="page--"
         >
-          <svg width="6" height="10" viewBox="0 0 6 10" fill="none">
+          <svg
+            width="6"
+            height="10"
+            viewBox="0 0 6 10"
+            fill="none">
             <path
               d="M5.25 1.75L1.5 5L5.25 8.25"
               stroke="currentColor"
@@ -108,10 +112,14 @@
         <button
           class="pagination-btn pagination-arrow"
           :disabled="page === totalPages"
-          @click="page++"
           aria-label="Следующая страница"
+          @click="page++"
         >
-          <svg width="6" height="10" viewBox="0 0 6 10" fill="none">
+          <svg
+            width="6"
+            height="10"
+            viewBox="0 0 6 10"
+            fill="none">
             <path
               d="M0.75 8.25L4.5 5L0.75 1.75"
               stroke="currentColor"

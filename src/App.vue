@@ -52,18 +52,18 @@ export default {
       };
     },
   },
+  watch: {
+    '$route.name'() {
+      this.updateActiveTab();
+      this.updateIndicator();
+    },
+  },
   mounted() {
     this.updateIndicator();
     window.addEventListener('resize', this.updateIndicator);
   },
   beforeUnmount() {
     window.removeEventListener('resize', this.updateIndicator);
-  },
-  watch: {
-    '$route.name'() {
-      this.updateActiveTab();
-      this.updateIndicator();
-    },
   },
   methods: {
     isActive(routeName) {
