@@ -112,7 +112,11 @@
 <script>
 import axios from 'axios';
 import { formatMatchDate, formatMatchTime, isMatchInLocalDateRange, getUTCRangeFromLocalDates } from '../utils/formatDate';
-
+const STORAGE_KEYS = {
+  DATE_FROM: 'leagueMatches_dateFrom',
+  DATE_TO: 'leagueMatches_dateTo',
+  PAGE: 'leagueMatches_page'
+};
 export default {
   name: 'LeagueMatches',
   data() {
@@ -186,24 +190,81 @@ export default {
     };
   },
   watch: {
-    dateFrom() {
-      this.page = 1;
-      if (this.dateFrom && this.dateTo) {
-        this.loadMatches();
+   dateFrom(newVal, oldVal) {
+      // Сохраняем в localStorage при изменении
+      this.saveToLocalStorage();
+      
+      if (newVal !== oldVal) {
+        this.page = 1;
+        if (this.dateFrom && this.dateTo) {
+          this.loadMatches();
+        }
       }
     },
-    dateTo() {
-      this.page = 1;
-      if (this.dateFrom && this.dateTo) {
-        this.loadMatches();
+    dateTo(newVal, oldVal) {
+      this.saveToLocalStorage();
+      
+      if (newVal !== oldVal) {
+        this.page = 1;
+        if (this.dateFrom && this.dateTo) {
+          this.loadMatches();
+        }
       }
     },
+    page(newVal) {
+      this.saveToLocalStorage();
+    }
   },
-  async mounted() {
+ async mounted() {
     this.leagueId = this.$route.params.id;
+
+    this.loadFiltersFromStorage();
+    
     await this.loadMatches();
   },
   methods: {
+    saveToLocalStorage() {
+      if (!this.leagueId) return;
+      
+      const storageKey = `league_${this.leagueId}`;
+      
+      const filters = {
+        dateFrom: this.dateFrom,
+        dateTo: this.dateTo,
+        page: this.page,
+        timestamp: Date.now() // для возможной очистки старых данных
+      };
+      
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(filters));
+      } catch (error) {
+        console.warn('Ошибка сохранения в localStorage:', error);
+      }
+    },
+    
+    // Загрузка из localStorage
+    loadFiltersFromStorage() {
+      if (!this.leagueId) return;
+      
+      const storageKey = `league_${this.leagueId}`;
+      
+      try {
+        const saved = localStorage.getItem(storageKey);
+        if (saved) {
+          const filters = JSON.parse(saved);
+
+          this.dateFrom = filters.dateFrom || '';
+          this.dateTo = filters.dateTo || '';
+
+          this.page = filters.page && filters.page > 0 ? filters.page : 1;
+          
+          console.log('Загружены фильтры из localStorage:', filters);
+        }
+      } catch (error) {
+        console.warn('Ошибка загрузки из localStorage:', error);
+      }
+    },
+    
     async loadMatches() {
       this.loading = true;
       this.error = null;
