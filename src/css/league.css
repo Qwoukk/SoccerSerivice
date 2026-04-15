@@ -3,31 +3,29 @@
   min-height: 100vh;
   padding-top: 20px;
 }
-
+ 
 .leagues-container {
   margin: 0 auto;
   padding: 0 110px 40px;
 }
-
-/* Секция поиска */
+ 
 .search-section {
   margin-bottom: 80px;
 }
-
+ 
 .search-label {
   font-size: 14px;
   color: #000000;
   margin-bottom: 8px;
   font-weight: 500;
 }
-
-/* Поисковая строка с кастомной иконкой */
+ 
 .search-wrapper {
   position: relative;
   display: flex;
   align-items: center;
 }
-
+ 
 .search-icon {
   position: absolute;
   left: 16px;
@@ -37,38 +35,38 @@
   z-index: 1;
   transition: color 0.2s;
 }
-
+ 
 .search-input {
   width: 100%;
   height: 44px;
   padding: 0 40px 0 48px;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 17px;
   font-family: inherit;
   background-color: #ffffff;
   transition: all 0.2s ease;
 }
-
+ 
 .search-input:hover {
   border-color: #9ca3af;
 }
-
+ 
 .search-input:focus {
   outline: none;
   border-color: #116acc;
   box-shadow: 0 0 0 2px rgba(17, 106, 204, 0.1);
   caret-color: #116acc;
 }
-
+ 
 .search-input:not(:placeholder-shown) {
   border-color: #116acc;
 }
-
+ 
 .search-input::placeholder {
   color: #9ca3af;
 }
-
+ 
 .clear-icon {
   position: absolute;
   right: 12px;
@@ -82,12 +80,12 @@
   transition: all 0.2s ease;
   z-index: 2;
 }
-
+ 
 .clear-icon.visible {
   opacity: 0.6;
   visibility: visible;
 }
-
+ 
 .clear-icon:hover {
   opacity: 1;
 }
@@ -103,14 +101,7 @@
 .search-input::-webkit-search-cancel-button {
   display: none;
 }
-
-.search-input[type='search']::-webkit-search-decoration,
-.search-input[type='search']::-webkit-search-cancel-button,
-.search-input[type='search']::-webkit-search-results-button,
-.search-input[type='search']::-webkit-search-results-decoration {
-  display: none;
-}
-
+ 
 /* Сетка лиг */
 .leagues-grid {
   display: grid;
@@ -118,7 +109,7 @@
   gap: 24px;
   margin-bottom: 40px;
 }
-
+ 
 .league-card {
   background-color: #ffffff;
   border: 1px solid #e0e0e0;
@@ -132,13 +123,13 @@
   align-items: center;
   justify-content: space-between;
 }
-
+ 
 .league-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border-color: #116acc;
+  box-shadow: 0 4px 12px #4f4f4f;
+  border-color: #4f4f4f;
 }
-
+ 
 .league-logo-wrapper {
   width: 160px;
   height: 160px;
@@ -147,7 +138,7 @@
   align-items: center;
   justify-content: center;
 }
-
+ 
 .league-logo {
   max-width: 160px;
   max-height: 160px;
@@ -155,62 +146,60 @@
   height: auto;
   object-fit: contain;
 }
-
+ 
 .league-logo-placeholder {
   width: 160px;
   height: 160px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 72px;
 }
-
+ 
 .league-logo-placeholder span {
   font-size: 72px;
 }
-
+ 
 .league-info {
   text-align: center;
   width: 100%;
   margin-top: auto;
 }
-
+ 
 .league-name {
-  font-size: 13px;
-  font-weight: 500;
-  color: #1a1a1a;
+  font-size: 16px;
+  color: #1c1c1c;
   margin-bottom: 4px;
   line-height: 1.3;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
 }
-
-.team-name {
-  font-size: 13px;
-  font-weight: bold;
+.team-name{
+  font-size: 16px;
   color: #000000;
-  line-height: 1.3;
+  font-weight: bold;
   margin-bottom: 4px;
+  line-height: 1.3;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
 }
-
+ 
 .league-country {
-  font-size: 11px;
-  color: #757575;
+  font-size: 14px;
+  color: #1c1c1c;
   line-height: 1.4;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
-/* Скелетон */
+ 
 .league-card-skeleton {
   background-color: #ffffff;
   border: 1px solid #e0e0e0;
@@ -220,7 +209,7 @@
   flex-direction: column;
   align-items: center;
 }
-
+ 
 .skeleton-logo {
   width: 160px;
   height: 160px;
@@ -230,7 +219,7 @@
   border-radius: 80px;
   margin-bottom: 24px;
 }
-
+ 
 .skeleton-title {
   height: 14px;
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
@@ -240,7 +229,7 @@
   margin-bottom: 6px;
   width: 70%;
 }
-
+ 
 .skeleton-subtitle {
   height: 11px;
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
@@ -249,19 +238,10 @@
   border-radius: 4px;
   width: 50%;
 }
-
+ 
 @keyframes loading {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
-}
-
-/* Ошибка */
-.error-alert {
-  margin-bottom: 20px;
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 .error-message {
@@ -272,7 +252,7 @@
   color: #ef4444;
   font-size: 16px;
 }
-
+ 
 .empty-state {
   text-align: center;
   padding: 60px 20px;
@@ -281,7 +261,7 @@
   color: #9ca3af;
   font-size: 16px;
 }
-
+ 
 /* Пагинация */
 .pagination-wrapper {
   display: flex;
@@ -291,7 +271,7 @@
   margin-top: 40px;
   margin-bottom: 40px;
 }
-
+ 
 .pagination-btn {
   display: inline-flex;
   align-items: center;
@@ -306,34 +286,32 @@
   font-size: 14px;
   font-weight: 400;
   color: #9ca3af;
-  transition:
-    background-color 0.15s,
-    color 0.15s;
+  transition: background-color 0.15s, color 0.15s;
   line-height: 1;
 }
-
+ 
 .pagination-btn:hover:not(:disabled):not(.active) {
   background-color: #f3f4f6;
   color: #4b5563;
 }
-
+ 
 .pagination-btn.active {
   background-color: #116acc;
   color: #ffffff;
   font-weight: 500;
   cursor: default;
 }
-
+ 
 .pagination-arrow {
   min-width: 32px;
   color: #9ca3af;
 }
-
+ 
 .pagination-btn:disabled {
   color: #d1d5db;
   cursor: not-allowed;
 }
-
+ 
 .pagination-dots {
   display: inline-flex;
   align-items: center;
@@ -352,7 +330,7 @@
   margin-left: 20px;
   margin-bottom: 100px;
 }
-
+ 
 .breadcrumb-link {
   font-size: 18px;
   font-weight: 500;
@@ -360,26 +338,25 @@
   cursor: pointer;
   transition: opacity 0.2s;
 }
-
+ 
 .breadcrumb-link:hover {
   opacity: 0.8;
   text-decoration: none;
 }
-
+ 
 .breadcrumb-separator {
   font-size: 18px;
   font-weight: 500;
   color: #000000;
   margin: 0 8px;
 }
-
+ 
 .breadcrumb-current {
   font-size: 18px;
   font-weight: 500;
   color: #000000;
 }
-
-/* Блок фильтрации */
+ 
 .filter-section {
   display: flex;
   align-items: center;
@@ -387,19 +364,18 @@
   margin-bottom: 80px;
   flex-wrap: wrap;
 }
-
+ 
 .filter-label {
   font-size: 18px;
   font-weight: 500;
-  color: #1a1a1a;
+  color: #000000;
 }
-
+ 
 .date-input-wrapper {
   position: relative;
   display: inline-block;
 }
-
-/* Стили для иконки календаря */
+ 
 .calendar-icon {
   position: absolute;
   right: 12px;
@@ -410,12 +386,11 @@
   pointer-events: none;
   z-index: 1;
 }
-
-/* Стили для поля ввода даты */
+ 
 .date-input {
   width: 300px;
   height: 44px;
-  padding: 0 40px 0 12px; /* Отступ справа для иконки */
+  padding: 0 40px 0 12px;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   font-size: 14px;
@@ -423,18 +398,29 @@
   background-color: #ffffff;
   cursor: pointer;
   transition: border-color 0.2s;
+  color: #000000;
 }
 
+.date-input::-webkit-datetime-edit-text {
+  color: #000000;
+  font-size: 18px;
+}
+
+.date-input::-webkit-datetime-edit {
+  color: #000000;
+  font-size: 18px;
+}
+ 
 .date-input:hover {
   border-color: #116acc;
 }
-
+ 
 .date-input:focus {
   outline: none;
   border-color: #116acc;
   box-shadow: 0 0 0 2px rgba(17, 106, 204, 0.1);
 }
-
+ 
 .date-input::-webkit-calendar-picker-indicator {
   opacity: 0;
   position: absolute;
@@ -452,7 +438,7 @@
   overflow: hidden;
   margin-bottom: 40px;
 }
-
+ 
 .match-row {
   display: grid;
   grid-template-columns: 120px 80px 140px 1fr 140px;
@@ -462,262 +448,40 @@
   border-bottom: 1px solid #9ca3af;
   transition: background-color 0.2s;
 }
-
+ 
 .match-row:hover {
   background-color: #f5f5f5;
 }
-
-.match-date {
-  font-size: 18px;
-  font-weight: 500;
-  color: #1a1a1a;
-}
-
-.match-time {
-  font-size: 18px;
-  font-weight: 500;
-  color: #1a1a1a;
-}
-
-.match-status {
-  font-size: 18px;
-  font-weight: 500;
-}
-
-.match-teams {
-  font-size: 18px;
-  font-weight: 500;
-  color: #1a1a1a;
-}
-
+ 
+.match-date,
+.match-time,
+.match-status,
+.match-teams,
 .match-score {
   font-size: 18px;
   font-weight: 500;
+  color: #000000;
+}
+ 
+.match-score {
   font-family: monospace;
   color: #1a1a1a;
   text-align: right;
 }
-
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.6;
-  }
+ 
+.match-teams {
+  color: #1a1a1a;
 }
 
-/* Скелетон для строк матчей */
 .match-row-skeleton {
   padding: 16px 24px;
   border-bottom: 1px solid #9ca3af;
 }
-
+ 
 .skeleton-cell {
   height: 60px;
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 200% 100%;
   animation: loading 1.5s infinite;
   border-radius: 8px;
-}
-
-/* Адаптивность */
-@media (max-width: 1200px) {
-  .leagues-container {
-    padding: 20px 60px 40px;
-  }
-
-  .leagues-grid {
-    gap: 20px;
-  }
-
-  .league-logo-wrapper {
-    width: 130px;
-    height: 130px;
-  }
-
-  .league-logo {
-    max-width: 130px;
-    max-height: 130px;
-  }
-
-  .league-logo-placeholder {
-    width: 130px;
-    height: 130px;
-    font-size: 60px;
-  }
-}
-
-@media (max-width: 992px) {
-  .leagues-container {
-    padding: 20px 40px 40px;
-  }
-
-  .leagues-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  .league-logo-wrapper {
-    width: 120px;
-    height: 120px;
-  }
-
-  .league-logo {
-    max-width: 120px;
-    max-height: 120px;
-  }
-
-  .league-logo-placeholder {
-    width: 120px;
-    height: 120px;
-    font-size: 56px;
-  }
-}
-
-@media (max-width: 1024px) {
-  .match-row {
-    grid-template-columns: 100px 70px 120px 1fr 120px;
-    gap: 12px;
-    padding: 14px 20px;
-  }
-
-  .match-date,
-  .match-time,
-  .match-status,
-  .match-teams,
-  .match-score {
-    font-size: 16px;
-  }
-}
-
-@media (max-width: 768px) {
-  .leagues-container {
-    padding: 16px 20px 32px;
-  }
-
-  .breadcrumbs-wrapper {
-    margin-top: 16px;
-    margin-bottom: 60px;
-  }
-
-  .breadcrumb-link,
-  .breadcrumb-separator,
-  .breadcrumb-current {
-    font-size: 16px;
-  }
-
-  .filter-section {
-    margin-bottom: 60px;
-    gap: 12px;
-  }
-
-  .filter-label {
-    font-size: 16px;
-  }
-
-  .date-input {
-    width: 100%;
-    max-width: 250px;
-  }
-
-  .leagues-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-  }
-
-  .league-logo-wrapper {
-    width: 100px;
-    height: 100px;
-  }
-
-  .league-logo {
-    max-width: 100px;
-    max-height: 100px;
-  }
-
-  .league-logo-placeholder {
-    width: 100px;
-    height: 100px;
-    font-size: 48px;
-  }
-
-  .match-row {
-    grid-template-columns: 1fr 1fr;
-    grid-template-areas:
-      'date time'
-      'status status'
-      'teams teams'
-      'score score';
-    gap: 8px;
-    padding: 16px;
-  }
-
-  .match-date {
-    grid-area: date;
-    font-size: 14px;
-  }
-
-  .match-time {
-    grid-area: time;
-    font-size: 14px;
-    text-align: right;
-  }
-
-  .match-status {
-    grid-area: status;
-    font-size: 14px;
-  }
-
-  .match-teams {
-    grid-area: teams;
-    font-size: 14px;
-  }
-
-  .match-score {
-    grid-area: score;
-    font-size: 14px;
-    text-align: left;
-  }
-}
-
-@media (max-width: 480px) {
-  .leagues-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .matches-table {
-    border-radius: 8px;
-  }
-
-  .match-row {
-    padding: 12px;
-  }
-
-  .date-input {
-    max-width: 100%;
-  }
-
-  .filter-section {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .league-card {
-    flex-direction: row;
-    text-align: left;
-    padding: 20px;
-    gap: 20px;
-  }
-
-  .league-logo-wrapper {
-    margin-bottom: 0;
-    width: 80px;
-    height: 80px;
-  }
-
-  .league-info {
-    text-align: left;
-    margin-top: 0;
-  }
 }

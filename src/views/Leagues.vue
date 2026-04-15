@@ -7,15 +7,15 @@
         <div class="search-wrapper">
           <img src="/search/Search.svg" alt="search" class="search-icon" />
           <input
-            type="search"
+            ref="searchInput"
+            type="text"
             v-model="search"
             placeholder="Search"
             class="search-input"
             :class="{ 'search-executed': searchExecuted }"
-            @focus="handleFocus"
-            @blur="handleBlur"
             @keyup.enter="handleSearch"
-            @input="showClearIcon = search.length > 0"
+            @input="handleInput"
+            @focus="handleFocus"
           />
           <img
             v-if="search.length > 0"
@@ -27,7 +27,8 @@
           />
         </div>
       </div>
-
+ 
+      <!-- Скелетон загрузки -->
       <div v-if="loading" class="leagues-grid">
         <div v-for="n in 16" :key="n" class="league-card-skeleton">
           <div class="skeleton-logo"></div>
@@ -63,14 +64,14 @@
               <span></span>
             </div>
           </div>
-
+ 
           <div class="league-info">
             <div class="league-name">{{ league.name }}</div>
             <div class="league-country">{{ league.area.name }}</div>
           </div>
         </div>
       </div>
-
+ 
       <!-- Пагинация -->
       <div v-if="!loading && !error && totalPages > 1" class="pagination-wrapper">
         <!-- Стрелка назад -->
@@ -90,19 +91,19 @@
             />
           </svg>
         </button>
-
-        <!-- Номера страниц с троеточием -->
-        <template v-for="item in paginationItems" :key="item">
+ 
+        <template v-for="(item, index) in paginationItems" :key="index">
           <span v-if="item === '...'" class="pagination-dots">...</span>
           <button
             v-else
             :class="['pagination-btn', { active: page === item }]"
+            :aria-current="page === item ? 'page' : undefined"
             @click="page = item"
           >
             {{ item }}
           </button>
         </template>
-
+ 
         <!-- Стрелка вперёд -->
         <button
           class="pagination-btn pagination-arrow"
@@ -112,7 +113,7 @@
         >
           <svg width="6" height="10" viewBox="0 0 6 10" fill="none">
             <path
-              d="M0.75 1.75L4.5 5L0.75 8.25"
+              d="M0.75 8.25L4.5 5L0.75 1.75"
               stroke="currentColor"
               stroke-width="1.5"
               stroke-linecap="round"
@@ -124,17 +125,16 @@
     </div>
   </div>
 </template>
-
+ 
 <script>
 import axios from 'axios';
-
+ 
 export default {
   name: 'Leagues',
   data() {
     return {
       leagues: [],
       search: '',
-      searchQuery: '',
       page: 1,
       itemsPerPage: 16,
       loading: false,
@@ -144,11 +144,14 @@ export default {
     };
   },
   computed: {
+    // Динамическая фильтрация по search — реагирует на каждый символ
     filteredLeagues() {
-      if (!this.searchQuery.trim()) return this.leagues;
-      const q = this.searchQuery.toLowerCase();
+      if (!this.search.trim()) return this.leagues;
+      const q = this.search.toLowerCase();
       return this.leagues.filter(
-        (l) => l.name.toLowerCase().includes(q) || l.area.name.toLowerCase().includes(q)
+        (l) =>
+          l.name.toLowerCase().includes(q) ||
+          l.area.name.toLowerCase().includes(q)
       );
     },
     paginatedLeagues() {
@@ -162,36 +165,30 @@ export default {
       const total = this.totalPages;
       const current = this.page;
       const items = [];
-
+ 
       if (total <= 7) {
-        // Все страницы без троеточия
         for (let i = 1; i <= total; i++) items.push(i);
         return items;
       }
-
-      // Всегда показываем первую
+ 
       items.push(1);
-
-      if (current > 4) {
-        items.push('...');
-      }
-
-      // Окно вокруг текущей страницы
+ 
+      if (current > 4) items.push('...');
+ 
       const start = Math.max(2, current - 2);
       const end = Math.min(total - 1, current + 2);
       for (let i = start; i <= end; i++) items.push(i);
-
-      if (current < total - 3) {
-        items.push('...');
-      }
-
+ 
+      if (current < total - 3) items.push('...');
+ 
       items.push(total);
-
+ 
       return items;
     },
   },
   watch: {
-    searchQuery() {
+    // Сброс пагинации при любом изменении строки поиска
+    search() {
       this.page = 1;
     },
   },
@@ -199,40 +196,37 @@ export default {
     await this.fetchLeagues();
   },
   methods: {
-    handleFocus() {
-      this.searchExecuted = false;
-    },
-    handleBlur() {
-      // Если после потери фокуса есть текст, но не было Enter, показываем крестик
-      if (this.search.length > 0 && !this.searchExecuted) {
-        this.showClearIcon = true;
+    handleInput() {
+      this.showClearIcon = this.search.length > 0;
+      // Пока пользователь снова печатает — убираем "зафиксированный" стиль
+      if (this.searchExecuted) {
+        this.searchExecuted = false;
       }
     },
     handleSearch() {
-      this.searchQuery = this.search;
+      if (!this.search.trim()) return;
       this.searchExecuted = true;
       this.showClearIcon = false;
-      // Убираем фокус с input элемента
       this.$nextTick(() => {
-        const input = document.querySelector('.search-input');
-        if (input) input.blur();
+        this.$refs.searchInput.blur();
       });
+    },
+    handleFocus() {
+      this.searchExecuted = false;
+      this.showClearIcon = this.search.length > 0;
     },
     clearSearch() {
       this.search = '';
-      this.searchQuery = '';
       this.showClearIcon = false;
       this.searchExecuted = false;
-      // Фокусируемся на поле ввода после очистки
       this.$nextTick(() => {
-        const input = document.querySelector('.search-input');
-        if (input) input.focus();
+        this.$refs.searchInput.focus();
       });
     },
     async fetchLeagues() {
       this.loading = true;
       this.error = null;
-
+ 
       try {
         const { data } = await axios.get('/api/v4/competitions', {
           headers: {
@@ -241,7 +235,10 @@ export default {
         });
 
         this.leagues = (data.competitions || []).filter(
-          (league) => league.type === 'LEAGUE' || league.type === 'CUP'
+          (league) =>
+            !league.type ||
+            league.type === 'LEAGUE' ||
+            league.type === 'CUP'
         );
       } catch (err) {
         const status = err.response?.status;

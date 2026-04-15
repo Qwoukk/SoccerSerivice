@@ -7,15 +7,15 @@
         <div class="search-wrapper">
           <img src="/search/Search.svg" alt="search" class="search-icon" />
           <input
+            ref="searchInput"
             type="text"
             v-model="search"
             placeholder="Search"
             class="search-input"
             :class="{ 'search-executed': searchExecuted }"
-            @focus="handleFocus"
-            @blur="handleBlur"
             @keyup.enter="handleSearch"
-            @input="showClearIcon = search.length > 0"
+            @input="handleInput"
+            @focus="handleFocus"
           />
           <img
             v-if="search.length > 0"
@@ -71,7 +71,6 @@
 
       <!-- Пагинация -->
       <div v-if="!loading && !error && totalPages > 1" class="pagination-wrapper">
-        <!-- Стрелка назад -->
         <button
           class="pagination-btn pagination-arrow"
           :disabled="page === 1"
@@ -89,7 +88,6 @@
           </svg>
         </button>
 
-        <!-- Номера страниц с троеточием -->
         <template v-for="item in paginationItems" :key="item">
           <span v-if="item === '...'" class="pagination-dots">...</span>
           <button
@@ -101,7 +99,6 @@
           </button>
         </template>
 
-        <!-- Стрелка вперёд -->
         <button
           class="pagination-btn pagination-arrow"
           :disabled="page === totalPages"
@@ -132,7 +129,6 @@ export default {
     return {
       teams: [],
       search: '',
-      searchQuery: '',
       page: 1,
       itemsPerPage: 16,
       loading: false,
@@ -143,8 +139,8 @@ export default {
   },
   computed: {
     filteredTeams() {
-      if (!this.searchQuery.trim()) return this.teams;
-      const q = this.searchQuery.toLowerCase();
+      if (!this.search.trim()) return this.teams;
+      const q = this.search.toLowerCase();
       return this.teams.filter((team) => team.name.toLowerCase().includes(q));
     },
     paginatedTeams() {
@@ -188,7 +184,7 @@ export default {
     },
   },
   watch: {
-    searchQuery() {
+    search() {
       this.page = 1;
     },
   },
@@ -224,35 +220,31 @@ export default {
         this.loading = false;
       }
     },
-    handleFocus() {
-      // Убираем тень при фокусе
-      this.searchExecuted = false;
-    },
-    handleBlur() {
-      // Если после потери фокуса есть текст, но не было Enter, показываем крестик
-      if (this.search.length > 0 && !this.searchExecuted) {
-        this.showClearIcon = true;
+    handleInput() {
+      this.showClearIcon = this.search.length > 0;
+      // Пока пользователь снова печатает — убираем "зафиксированный" стиль
+      if (this.searchExecuted) {
+        this.searchExecuted = false;
       }
     },
     handleSearch() {
-      this.searchQuery = this.search;
+      if (!this.search.trim()) return;
       this.searchExecuted = true;
       this.showClearIcon = false;
-      // Убираем фокус с input элемента
       this.$nextTick(() => {
-        const input = document.querySelector('.search-input');
-        if (input) input.blur();
+        this.$refs.searchInput.blur();
       });
+    },
+    handleFocus() {
+      this.searchExecuted = false;
+      this.showClearIcon = this.search.length > 0;
     },
     clearSearch() {
       this.search = '';
-      this.searchQuery = '';
       this.showClearIcon = false;
       this.searchExecuted = false;
-      // Фокусируемся на поле ввода после очистки
       this.$nextTick(() => {
-        const input = document.querySelector('.search-input');
-        if (input) input.focus();
+        this.$refs.searchInput.focus();
       });
     },
     goToTeam(id) {

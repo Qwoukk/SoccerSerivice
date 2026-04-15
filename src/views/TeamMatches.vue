@@ -37,8 +37,8 @@
 
       <div v-else class="matches-table">
         <div v-for="match in paginatedMatches" :key="match.id" class="match-row">
-          <div class="match-date">{{ formatDate(match.utcDate) }}</div>
-          <div class="match-time">{{ formatTime(match.utcDate) }}</div>
+          <div class="match-date">{{ formatMatchDate(match.utcDate) }}</div>
+          <div class="match-time">{{ formatMatchTime(match.utcDate) }}</div>
 
           <div class="match-status">
             <span :class="getStatusClass(match.status)">
@@ -57,7 +57,6 @@
       <!-- Пагинация -->
 
       <div v-if="!loading && !error && totalPages > 1" class="pagination-wrapper">
-        <!-- Стрелка назад -->
         <button
           class="pagination-btn pagination-arrow"
           :disabled="page === 1"
@@ -86,7 +85,6 @@
           </button>
         </template>
 
-        <!-- Стрелка вперёд -->
         <button
           class="pagination-btn pagination-arrow"
           :disabled="page === totalPages"
@@ -110,6 +108,8 @@
 
 <script>
 import axios from 'axios';
+import { formatMatchDate, formatMatchTime, isMatchInLocalDateRange, 
+getUTCRangeFromLocalDates } from '../utils/formatDate';
 
 export default {
   name: 'TeamMatches',
@@ -131,15 +131,8 @@ export default {
       if (!this.dateFrom || !this.dateTo) {
         return [...this.matches];
       }
-
-      const fromDate = new Date(this.dateFrom);
-      fromDate.setHours(0, 0, 0, 0);
-      const toDate = new Date(this.dateTo);
-      toDate.setHours(23, 59, 59, 999);
-
       return this.matches.filter((match) => {
-        const matchDate = new Date(match.utcDate);
-        return matchDate >= fromDate && matchDate <= toDate;
+        return isMatchInLocalDateRange(match.utcDate, this.dateFrom, this.dateTo);
       });
     },
     paginatedMatches() {
@@ -166,8 +159,6 @@ export default {
       if (current > 4) {
         items.push('...');
       }
-
-      // Окно вокруг текущей страницы
       const start = Math.max(2, current - 2);
       const end = Math.min(total - 1, current + 2);
       for (let i = start; i <= end; i++) items.push(i);
@@ -182,15 +173,15 @@ export default {
     },
   },
   watch: {
-    dateFrom(val) {
-      if ((val && this.dateTo) || (!val && !this.dateTo)) {
-        this.page = 1;
+    dateFrom() {
+      this.page = 1;
+      if (this.dateFrom && this.dateTo) {
         this.loadMatches();
       }
     },
-    dateTo(val) {
-      if ((val && this.dateFrom) || (!val && !this.dateFrom)) {
-        this.page = 1;
+    dateTo() {
+      this.page = 1;
+      if (this.dateFrom && this.dateTo) {
         this.loadMatches();
       }
     },
@@ -209,8 +200,9 @@ export default {
         const params = {};
 
         if (this.dateFrom && this.dateTo) {
-          params.dateFrom = this.dateFrom;
-          params.dateTo = this.dateTo;
+          const utcRange = getUTCRangeFromLocalDates(this.dateFrom, this.dateTo);
+          params.dateFrom = utcRange.dateFrom;
+          params.dateTo = utcRange.dateTo;
         }
 
         const response = await axios.get(url, {
@@ -222,7 +214,6 @@ export default {
 
         this.matches = response.data.matches || [];
 
-        // Получаем название команды отдельным запросом, если не пришло в ответе
         if (response.data.team?.name) {
           this.teamName = response.data.team.name;
         } else {
@@ -246,21 +237,11 @@ export default {
         this.loading = false;
       }
     },
-    formatDate(dateString) {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('ru-RU', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-      });
+    formatMatchDate(dateString) {
+      return formatMatchDate(dateString);
     },
-    formatTime(dateString) {
-      const date = new Date(dateString);
-      return date.toLocaleTimeString('ru-RU', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-      });
+    formatMatchTime(dateString) {
+      return formatMatchTime(dateString);
     },
     getStatusText(status) {
       const statuses = {
