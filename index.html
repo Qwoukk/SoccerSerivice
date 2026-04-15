@@ -16,5 +16,14 @@
   </head>
   <body>
     <div id="app"></div>
+    <script type="text/javascript">
+      // Handle redirect from 404.html
+      (function() {
+        if (window.location.search.startsWith('?/')) {
+          var redirect = window.location.search.slice(2).replace(/~and~/g, '&') + window.location.hash;
+          window.history.replaceState(null, null, window.location.pathname + redirect);
+        }
+      })();
+    </script>
   </body>
 </html>
