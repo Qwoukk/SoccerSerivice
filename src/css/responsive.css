@@ -21,7 +21,7 @@
 /* Landscape ориентация */
 @media (orientation: landscape) and (max-height: 600px) {
   .main-bg {
-    padding-top: 56px;
+    padding-top: 20px;
   }
 
   .leagues-grid {
@@ -122,6 +122,7 @@
 }
 
 @media (max-width: 768px) {
+  .navbar-indicator {bottom: -15px;}
   .leagues-container { padding: 16px 20px 32px; }
   .breadcrumbs-wrapper { margin-top: 16px; margin-bottom: 60px; }
   .breadcrumb-link,
@@ -152,6 +153,7 @@
 }
 
 @media (max-width: 480px) {
+  .navbar-indicator {bottom: -15px;}
   .leagues-grid { grid-template-columns: 1fr; }
   .matches-table { border-radius: 8px; }
   .match-row { padding: 12px; }
