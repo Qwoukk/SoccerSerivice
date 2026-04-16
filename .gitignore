@@ -23,10 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 
-# Environment files
-.env
-.env.*
-
 # Build and cache
 .cache
 .eslintcache
